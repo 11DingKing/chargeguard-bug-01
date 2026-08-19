@@ -18,12 +18,15 @@ func NewDispatchStore() *DispatchStore {
 	return &DispatchStore{state: DispatchState{Status: "reported"}}
 }
 func (s *DispatchStore) Dispatch(owner string) error {
-	s.state.Status = "assigned"
-	s.state.Owner = owner
+	old := s.state
+	next := old
+	next.Status = "assigned"
+	next.Owner = owner
 	if s.FailAudit {
 		return ErrDispatchAudit
 	}
-	s.state.Audits++
+	next.Audits++
+	s.state = next
 	return nil
 }
 func (s *DispatchStore) Snapshot() DispatchState { return s.state }
